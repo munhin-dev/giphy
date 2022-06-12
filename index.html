@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Game</title>
+    <link rel="stylesheet" href="./css/reset.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body ondragstart="return false;" ondrop="return false;">
+    <main>
+      <section class="game-settings">
+        <label for="mood">Mood:</label>
+        <select id="mood">
+          <option value="happy">Happy</option>
+          <option value="angry">Angry</option>
+          <option value="bored">Bored</option>
+          <option value="lonely">Lonely</option>
+          <option value="pain">Pain</option>
+          <option value="relax">Relaxed</option>
+          <option value="scared">Scared</option>
+          <option value="shocked">Shocked</option>
+          <option value="frustrated">Frustrated</option>
+        </select>
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty">
+          <option value="beginner">Beginner</option>
+          <option value="advance">Advance</option>
+        </select>
+        <p>Timer: <span class="timer">0</span> seconds</p>
+        <p>Fastest Attempt: <span class="high-score">0</span> seconds</p>
+      </section>
+      <section class="board "></section>
+      <div class="button-container">
+        <button class="start-btn">Start Game</button>
+      </div>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
