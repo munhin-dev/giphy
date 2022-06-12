@@ -11,7 +11,7 @@ let countdownTimer;
 let countdownTimeout;
 
 const getImage = async (keyword, size) => {
-  const randomNumber = Math.floor(Math.random() * 300);
+  const randomNumber = Math.floor(Math.random() * 3500);
   const res = await fetch(
     `https://api.giphy.com/v1/gifs/search?api_key=VSq4XjMAX1ceL6LwsQtRKJH9B1WNhu90&q=${keyword}&limit=${size}&offset=${randomNumber}&rating=pg-13&lang=ja`
   );
