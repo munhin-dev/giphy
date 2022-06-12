@@ -15,14 +15,13 @@ body {
 .board {
   clear: right;
   position: relative;
-  left: -1%;
   margin-top: 20px;
   display: grid;
   gap: 10px;
 }
 
 .game-settings {
-  padding: 12px;
+  padding: 10px;
   background-color: #0d7377;
   color: #eeeeee;
   font-size: 1rem;
@@ -41,8 +40,10 @@ body {
 
 .cover,
 img {
-  width: 100%;
+  display: block;
   height: 100%;
+  width: 100%;
+  object-fit: fill;
   border-radius: 10px;
   box-shadow: rgba(180, 165, 165, 0.4) 0px 0px 0px 2px,
     rgba(180, 165, 165, 0.65) 0px 4px 6px -1px,
