@@ -30,7 +30,7 @@ const shuffleImage = array => {
   return array;
 };
 
-const generateBoard = async (anime, difficulty) => {
+const generateBoard = async (mood, difficulty) => {
   let size;
   if (difficulty === "beginner") {
     size = "8";
@@ -40,7 +40,7 @@ const generateBoard = async (anime, difficulty) => {
     container.style.gridTemplateColumns = "repeat(6,1fr)";
   }
 
-  let images = await getImage(anime, size);
+  let images = await getImage(mood, size);
   images = shuffleImage([...images, ...images]);
   images.forEach(image => {
     const card = document.createElement("div");
@@ -124,9 +124,12 @@ container.onclick = async event => {
 
 gameSettings.onchange = event => {
   gameStarted = false;
-  mood.value = event.target.id === "anime" ? event.target.value : mood.value;
-  difficulty.value =
-    event.target.id === "difficulty" ? event.target.value : difficulty.value;
+  if (event.target.id === "mood") {
+    mood.value = event.target.value;
+  } else {
+    difficulty.value = event.target.value;
+    highScore.textContent = "0";
+  }
   clearTimeout(countdownTimeout);
   clearInterval(gameTimer);
   clearInterval(countdownTimer);
