@@ -18,7 +18,7 @@ const getImage = async (keyword, size) => {
   );
   const { data } = await res.json();
   return data.map(({ images }, index) => ({
-    url: images.downsized.url,
+    url: images.downsized_medium.url,
     key: index,
   }));
 };
