@@ -2,8 +2,8 @@ const container = document.querySelector(".board");
 const difficulty = document.querySelector("#difficulty");
 const mood = document.querySelector("#mood");
 const displayTimer = document.querySelector(".timer");
+const displayScore = document.querySelector(".high-score");
 const startBtn = document.querySelector(".start-btn");
-const highScore = document.querySelector(".high-score");
 const gameSettings = document.querySelector(".game-settings");
 let gameStarted = false;
 let gameTimer;
@@ -27,6 +27,7 @@ const shuffleImage = array => {
     const randomIndex = Math.floor(Math.random() * index);
     [array[index], array[randomIndex]] = [array[randomIndex], array[index]];
   }
+
   return array;
 };
 
@@ -69,11 +70,10 @@ const pause = async milliseconds => {
 };
 
 const timer = gameStarted => {
-  let count;
-  gameStarted ? (count = 0) : (count = 8);
+  let count = gameStarted ? 0 : 8;
   displayTimer.textContent = count;
   const timer = setInterval(() => {
-    gameStarted ? count++ : count--;
+    count = gameStarted ? count + 1 : count - 1;
     displayTimer.textContent = count;
   }, 1000);
   return timer;
@@ -90,36 +90,39 @@ const isMatch = cards =>
 const allFlipped = node => Array.from(node).every(card => !card.dataset.key);
 
 container.onclick = async event => {
-  if (!gameStarted) return;
-  if (!event.target.classList.contains("cover")) return;
+  if (!event.target.classList.contains("cover")) {
+    return;
+  }
+
   event.target.classList.add("show-card");
   const cards = document.querySelectorAll(".cover");
   const flipped = getFlipped(cards);
-  if (flipped.length === 1) return;
+  if (flipped.length === 1) {
+    return;
+  }
+
   if (isMatch(flipped)) {
     flipped.forEach(card => card.removeAttribute("data-key"));
     if (allFlipped(cards)) {
       gameStarted = false;
       clearInterval(gameTimer);
-      if (
-        Number(highScore.textContent) === 0 ||
-        Number(displayTimer.textContent) < Number(highScore.textContent)
-      ) {
-        highScore.textContent = displayTimer.textContent;
+      const bestTime = Number(displayScore.textContent);
+      const currentTime = Number(displayTimer.textContent);
+      if (bestTime === 0 || currentTime < bestTime) {
+        displayScore.textContent = currentTime;
       }
+
       startBtn.classList.toggle("hide-btn");
       startBtn.textContent = "Play Again";
-      return;
     }
-    return;
+  } else {
+    await pause(1000);
+    cards.forEach(card => {
+      if (card.dataset.key) {
+        card.classList.remove("show-card");
+      }
+    });
   }
-
-  await pause(1000);
-  cards.forEach(card => {
-    if (card.dataset.key) {
-      card.classList.remove("show-card");
-    }
-  });
 };
 
 gameSettings.onchange = event => {
@@ -130,6 +133,7 @@ gameSettings.onchange = event => {
     difficulty.value = event.target.value;
     highScore.textContent = "0";
   }
+
   clearTimeout(countdownTimeout);
   clearInterval(gameTimer);
   clearInterval(countdownTimer);
