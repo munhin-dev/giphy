@@ -12,13 +12,13 @@ let countdownTimer;
 let countdownTimeout;
 
 const getImage = async (keyword, size) => {
-  const randomNumber = Math.floor(Math.random() * 100);
+  const randomNumber = Math.floor(Math.random() * 1000);
   const res = await fetch(
     `https://api.giphy.com/v1/gifs/search?api_key=VSq4XjMAX1ceL6LwsQtRKJH9B1WNhu90&q=${keyword}&limit=${size}&offset=${randomNumber}&rating=g&lang=en`
   );
   const { data } = await res.json();
   return data.map(({ images }, index) => ({
-    url: images.downsized_medium.url,
+    url: images.fixed_width_downsampled.url,
     key: index,
   }));
 };
@@ -106,7 +106,7 @@ board.onclick = async event => {
   if (!event.target.classList.contains("cover")) {
     return;
   }
-
+  console.log("test");
   event.target.classList.add("show-card");
   const cards = document.querySelectorAll(".cover");
   const flipped = getFlipped(cards);
