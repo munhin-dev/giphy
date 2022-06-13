@@ -1,9 +1,10 @@
-const container = document.querySelector(".board");
+const board = document.querySelector(".board");
 const difficulty = document.querySelector("#difficulty");
 const mood = document.querySelector("#mood");
 const displayTimer = document.querySelector(".timer");
-const displayScore = document.querySelector(".high-score");
+const displayScore = document.querySelector(".score");
 const startBtn = document.querySelector(".start-btn");
+const loading = document.querySelector(".loading");
 const gameSettings = document.querySelector(".game-settings");
 let gameStarted = false;
 let gameTimer;
@@ -11,13 +12,13 @@ let countdownTimer;
 let countdownTimeout;
 
 const getImage = async (keyword, size) => {
-  const randomNumber = Math.floor(Math.random() * 4983);
+  const randomNumber = Math.floor(Math.random() * 100);
   const res = await fetch(
     `https://api.giphy.com/v1/gifs/search?api_key=VSq4XjMAX1ceL6LwsQtRKJH9B1WNhu90&q=${keyword}&limit=${size}&offset=${randomNumber}&rating=g&lang=en`
   );
   const { data } = await res.json();
   return data.map(({ images }, index) => ({
-    url: images.fixed_width_downsampled.url,
+    url: images.downsized.url,
     key: index,
   }));
 };
@@ -32,13 +33,15 @@ const shuffleImage = array => {
 };
 
 const generateBoard = async (mood, difficulty) => {
+  board.classList.remove("show-board");
+  loading.classList.add("show-loading");
   let size;
   if (difficulty === "beginner") {
     size = "8";
-    container.style.gridTemplateColumns = "repeat(4,1fr)";
+    board.style.gridTemplateColumns = "repeat(4,1fr)";
   } else {
     size = "18";
-    container.style.gridTemplateColumns = "repeat(6,1fr)";
+    board.style.gridTemplateColumns = "repeat(6,1fr)";
   }
 
   let images = await getImage(mood, size);
@@ -52,24 +55,34 @@ const generateBoard = async (mood, difficulty) => {
     cover.setAttribute("data-key", image.key);
     card.classList.add("card");
     card.append(img, cover);
-    container.append(card);
+    board.append(card);
   });
+  await Promise.all(
+    Array.from(document.images).map(
+      image =>
+        new Promise(resolve => {
+          image.onload = resolve;
+        })
+    )
+  );
+  loading.classList.remove("show-loading");
+  board.classList.add("show-board");
 };
 
-const pause = async milliseconds => {
+const pauseExecution = async milliseconds => {
   await new Promise(resolve => {
-    container.style.pointerEvents = "none";
+    board.style.pointerEvents = "none";
     countdownTimeout = setTimeout(() => {
       if (gameStarted) {
         resolve();
-        container.style.pointerEvents = "auto";
+        board.style.pointerEvents = "auto";
       }
     }, milliseconds);
   });
   return countdownTimeout;
 };
 
-const timer = gameStarted => {
+const startTimer = gameStarted => {
   let count = gameStarted ? 0 : 8;
   displayTimer.textContent = count;
   const timer = setInterval(() => {
@@ -89,7 +102,7 @@ const isMatch = cards =>
 
 const allFlipped = node => Array.from(node).every(card => !card.dataset.key);
 
-container.onclick = async event => {
+board.onclick = async event => {
   if (!event.target.classList.contains("cover")) {
     return;
   }
@@ -116,7 +129,7 @@ container.onclick = async event => {
       startBtn.textContent = "Play Again";
     }
   } else {
-    await pause(1000);
+    await pauseExecution(1000);
     cards.forEach(card => {
       if (card.dataset.key) {
         card.classList.remove("show-card");
@@ -131,28 +144,28 @@ gameSettings.onchange = event => {
     mood.value = event.target.value;
   } else {
     difficulty.value = event.target.value;
-    highScore.textContent = "0";
+    displayScore.textContent = "0";
   }
 
   clearTimeout(countdownTimeout);
   clearInterval(gameTimer);
   clearInterval(countdownTimer);
-  container.innerHTML = "";
+  board.innerHTML = "";
   startBtn.classList.remove("hide-btn");
   startBtn.textContent = "Start Game";
   displayTimer.textContent = "0";
 };
 
 startBtn.onclick = async () => {
-  container.innerHTML = "";
+  board.innerHTML = "";
   startBtn.classList.toggle("hide-btn");
   await generateBoard(mood.value, difficulty.value);
   const cards = document.querySelectorAll(".cover");
   cards.forEach(card => card.classList.add("show-card"));
-  countdownTimer = timer(gameStarted);
+  countdownTimer = startTimer(gameStarted);
   gameStarted = true;
-  countdownTimeout = await pause(8000);
+  countdownTimeout = await pauseExecution(8000);
   clearInterval(countdownTimer);
   cards.forEach(card => card.classList.remove("show-card"));
-  gameTimer = timer(gameStarted);
+  gameTimer = startTimer(gameStarted);
 };
